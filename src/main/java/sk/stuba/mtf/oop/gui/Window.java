@@ -26,8 +26,8 @@ public class Window {
         menu.add(logic.getPasteButton());
         menu.add(logic.getFontBox());
 
-        frame.add(menu, BorderLayout.PAGE_START);
         frame.add(logic.getTextArea(), BorderLayout.CENTER);
+        frame.add(menu, BorderLayout.PAGE_START);
 
         frame.setVisible(true);
     }

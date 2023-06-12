@@ -2,9 +2,12 @@ package sk.stuba.mtf.oop.controls;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import java.awt.event.*;
 
-public class UniversalAdapter implements KeyListener, MouseMotionListener, MouseListener, ActionListener, ChangeListener, ItemListener {
+public class UniversalAdapter implements KeyListener, MouseMotionListener, MouseListener, ActionListener, ChangeListener, ItemListener, DocumentListener {
     @Override
     public void itemStateChanged(ItemEvent e) {
 
@@ -56,5 +59,17 @@ public class UniversalAdapter implements KeyListener, MouseMotionListener, Mouse
     @Override
     public void stateChanged(ChangeEvent e) {
         
+    }
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        
+    }
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+
+    }
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+
     }
 }
