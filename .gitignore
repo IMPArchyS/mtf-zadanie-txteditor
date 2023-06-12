@@ -1,0 +1,8 @@
+# Idea
+.idea/
+target
+
+# VS code
+.settings/
+.classpath
+.project
