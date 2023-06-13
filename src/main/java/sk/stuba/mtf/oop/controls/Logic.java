@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.undo.UndoManager;
 
 import java.awt.*;
 
@@ -32,9 +36,12 @@ public class Logic extends UniversalAdapter {
     @Getter
     private JComboBox<String> fontBox;
 
+    private UndoManager undoManager;
     private String fontString;
+    private String currentText;
     private String previousText;
     public Logic() {
+        this.undoManager = new UndoManager();
         this.textArea = new JTextArea();
         this.fontString = "Default";
 
@@ -66,8 +73,10 @@ public class Logic extends UniversalAdapter {
         this.fontBox.setFocusable(false);
         this.fontBox.addItemListener(this);
         this.fontString = (String) this.fontBox.getSelectedItem();
-        this.previousText = "";
+        this.previousText = "";        
+        this.currentText = "";
         this.textArea.getDocument().addDocumentListener(this);
+        this.textArea.getDocument().addUndoableEditListener(this);
     }
 
     private void changeFontBasedOnString() {
@@ -119,19 +128,8 @@ public class Logic extends UniversalAdapter {
     }
 
     private void updateUndo() {
-        String currentText = this.textArea.getText();
-        this.previousText = currentText;
-    }
-
-    private void cutLastWord() {     
-        int lastSpaceIndex = this.previousText.lastIndexOf(' ') - 1;
-        if (lastSpaceIndex >= 0) {
-            this.previousText = this.previousText.substring(0, lastSpaceIndex);
-        } else {
-            this.previousText = "";
-        }
-        System.out.println(this.previousText);
-        this.textArea.setText(previousText);   
+        this.previousText = this.currentText;
+        this.currentText = this.textArea.getText();
     }
 
     @Override
@@ -149,7 +147,9 @@ public class Logic extends UniversalAdapter {
         } else if (e.getSource().equals(this.loadButton)) {
             this.loadFile();
         } else if (e.getSource().equals(this.undoButton)) {
-            this.cutLastWord();
+            if (this.undoManager.canUndoOrRedo()) {
+                this.undoManager.undo();
+            }
         } else if (e.getSource().equals(this.copyButton)) {
             this.textArea.copy();
         } else if (e.getSource().equals(this.pasteButton)) {
@@ -159,8 +159,25 @@ public class Logic extends UniversalAdapter {
 
     @Override
     public void insertUpdate(DocumentEvent e) {
-        System.out.println(previousText);
-        this.updateUndo();
+        Document document = e.getDocument();
+        try {
+            int offset = e.getOffset();
+            int length = e.getLength();
+            String insertedText = document.getText(offset, length);
+
+            if (insertedText.length() > 0) {
+                char lastInsertedChar = insertedText.charAt(insertedText.length() - 1);
+                if (lastInsertedChar == ' ') {
+                    return;
+                }
+            }
+            this.previousText = this.currentText;
+            this.currentText = document.getText(0, document.getLength());
+            System.out.println("c: " + currentText);
+            System.out.println("p: " + previousText);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -171,5 +188,9 @@ public class Logic extends UniversalAdapter {
     @Override
     public void changedUpdate(DocumentEvent e) {
         this.updateUndo();
+    }
+    @Override
+    public void undoableEditHappened(UndoableEditEvent e) {
+        this.undoManager.addEdit(e.getEdit());
     }
 }

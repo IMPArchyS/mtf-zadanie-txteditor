@@ -4,10 +4,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 
 import java.awt.event.*;
 
-public class UniversalAdapter implements KeyListener, MouseMotionListener, MouseListener, ActionListener, ChangeListener, ItemListener, DocumentListener {
+public class UniversalAdapter implements KeyListener, MouseMotionListener, MouseListener, ActionListener, ChangeListener, ItemListener, DocumentListener, UndoableEditListener {
     @Override
     public void itemStateChanged(ItemEvent e) {
 
@@ -71,5 +73,9 @@ public class UniversalAdapter implements KeyListener, MouseMotionListener, Mouse
     @Override
     public void changedUpdate(DocumentEvent e) {
 
+    }
+    @Override
+    public void undoableEditHappened(UndoableEditEvent e) {
+        
     }
 }
